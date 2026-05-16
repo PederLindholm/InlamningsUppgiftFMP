@@ -1,0 +1,37 @@
+package com.example.inlamningsuppgiftfmp.models;
+
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.time.LocalDate;
+
+@Entity
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class Booking {
+
+    @Id
+    @GeneratedValue
+    private Long id;
+
+    @ManyToOne
+    @JoinColumn
+    private Customer customer;
+
+    @ManyToOne
+    @JoinColumn
+    private Room room;
+
+    private LocalDate startDate;
+    private LocalDate endDate;
+
+    public Booking(Customer customer, Room room, LocalDate startDate, LocalDate endDate) {
+        this.customer = customer;
+        this.room = room;
+        this.startDate = startDate;
+        this.endDate = endDate;
+    }
+}
