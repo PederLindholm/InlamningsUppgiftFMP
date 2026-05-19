@@ -2,6 +2,8 @@ package com.example.inlamningsuppgiftfmp.controllers;
 
 import com.example.inlamningsuppgiftfmp.models.Customer;
 import com.example.inlamningsuppgiftfmp.repos.CustomerRepo;
+import com.example.inlamningsuppgiftfmp.services.CustomerService;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -13,9 +15,11 @@ import java.util.List;
 public class CustomerController {
 
     private final CustomerRepo customerRepo;
+    private final CustomerService customerService;
 
-    public CustomerController(CustomerRepo customerRepo) {
+    public CustomerController(CustomerRepo customerRepo, CustomerService customerService) {
         this.customerRepo = customerRepo;
+        this.customerService = customerService;
     }
 
     @RequestMapping("customers")
@@ -24,9 +28,12 @@ public class CustomerController {
     }
 
     @RequestMapping("customers/delete/{id}")
-    public String deleteCustomer(@PathVariable Long id){
-        customerRepo.deleteById(id);
-        return "Customer "+id+" deleted!";
+    public String deleteCustomer(@PathVariable Long id, Model model){
+       boolean deleted = customerService.deleteCustomer(id);
+       if (!deleted){
+        model.addAttribute("error", "Kan inte ta bort kunder med bokningar");
+       }
+       return "redirect:/customers";
     }
 
     @RequestMapping("customers/add")
