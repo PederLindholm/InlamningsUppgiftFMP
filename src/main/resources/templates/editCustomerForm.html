@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>FMP Inn</title>
+</head>
+<body>
+
+<h2>Edit an existing customer</h2>
+
+<form action="#" th:action="@{/customer/update}" th:object="${customer}"  method="post" >
+    <label for="name">Name:</label><br>
+    <input type="text" id="name" th:field="*{name}"><br>
+    <label for="email">Email:</label><br>
+    <input type="text" id="email" th:field="*{email}"><br>
+    <label for="tel">Tel:</label><br>
+    <input type="text" id="tel" th:field="*{tel}"><br>
+    <input type=hidden id="id" th:field="*{id}"><br>
+    <input type="submit" value="Submit">
+</form>
+
+</body>
+</html>

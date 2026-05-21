@@ -34,6 +34,7 @@ public class CustomerService {
         return toDto(saved);
 
     }
+
     public Optional<CustomerDto> updateCustomer(Long id, CustomerDto dto) {
         return customerRepo.findById(id).map(existing -> {
             existing.setName(dto.getName());
@@ -42,6 +43,7 @@ public class CustomerService {
             return toDto(customerRepo.save(existing));
         });
     }
+
     public boolean deleteCustomer(Long id) {
         boolean hasBookings = bookingRepo.existsByCustomerId(id);
         if (hasBookings) {

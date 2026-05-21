@@ -10,18 +10,17 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
 public class CustomerDto {
     private Long id;
 
-    @NotBlank(message = "Namn får inte vara tomt")
+    @NotBlank(message = "Name shall not be blank")
     private String name;
 
-    @NotBlank(message = "E-post får inte vara tom")
-    @Email(message = "Ogiltig e-postadress")
+    @NotBlank(message = "Email shall not be blank")
+    @Email(message = "Not valid email address")
     private String email;
 
-    @NotBlank(message = "Telefonnummer får inte vara tomt")
+    @NotBlank(message = "Telephone number shall not be blank")
     private String tel;
 
 }

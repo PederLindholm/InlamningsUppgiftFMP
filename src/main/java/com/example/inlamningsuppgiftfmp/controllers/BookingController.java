@@ -6,6 +6,7 @@ import com.example.inlamningsuppgiftfmp.models.Room;
 import com.example.inlamningsuppgiftfmp.repos.BookingRepo;
 import com.example.inlamningsuppgiftfmp.repos.CustomerRepo;
 import com.example.inlamningsuppgiftfmp.repos.RoomRepo;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -14,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.time.LocalDate;
 import java.util.List;
 
-@RestController
+@Controller
 public class BookingController {
 
     private final CustomerRepo customerRepo;

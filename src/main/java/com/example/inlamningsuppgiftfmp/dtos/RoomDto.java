@@ -10,14 +10,13 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
 public class RoomDto {
     private Long id;
 
-    @NotBlank(message = "Rumstyp måste anges")
+    @NotBlank(message = "Room type must be filled")
     private String type;
 
-    @Min(value = 0, message = "Antal extrasängar kan inte vara negativt")
+    @Min(value = 0, message = "Number of extra beds cannot be negative")
     private int maxExtraBed;
 
 

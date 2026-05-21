@@ -2,6 +2,7 @@ package com.example.inlamningsuppgiftfmp.controllers;
 
 import com.example.inlamningsuppgiftfmp.models.Room;
 import com.example.inlamningsuppgiftfmp.repos.RoomRepo;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -9,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-@RestController
+@Controller
 public class RoomController {
 
     private final RoomRepo roomRepo;
