@@ -1,8 +1,6 @@
 package com.example.inlamningsuppgiftfmp;
 
-import com.example.inlamningsuppgiftfmp.models.Booking;
-import com.example.inlamningsuppgiftfmp.models.Customer;
-import com.example.inlamningsuppgiftfmp.models.Room;
+import com.example.inlamningsuppgiftfmp.models.*;
 import com.example.inlamningsuppgiftfmp.repos.BookingRepo;
 import com.example.inlamningsuppgiftfmp.repos.CustomerRepo;
 import com.example.inlamningsuppgiftfmp.repos.RoomRepo;
@@ -31,11 +29,11 @@ public class InlamningsUppgiftFmpApplication {
             customerRepo.save(c2);
             customerRepo.save(c3);
 
-            Room r1 = new Room("single",0);
-            Room r2 = new Room("double",1);
-            Room r3 = new Room("double",2);
-            Room r4 = new Room("single",0);
-            Room r5 = new Room("double",2);
+            Room r1 = new Room(RoomType.SINGLE, MaxExtraBed.NONE);
+            Room r2 = new Room(RoomType.DOUBLE,MaxExtraBed.ONE);
+            Room r3 = new Room(RoomType.DOUBLE,MaxExtraBed.TWO);
+            Room r4 = new Room(RoomType.SINGLE,MaxExtraBed.NONE);
+            Room r5 = new Room(RoomType.DOUBLE,MaxExtraBed.TWO);
 
             roomRepo.save(r1);
             roomRepo.save(r2);

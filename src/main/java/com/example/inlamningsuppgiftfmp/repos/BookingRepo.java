@@ -12,6 +12,8 @@ public interface BookingRepo extends JpaRepository<Booking, Long> {
 
     boolean existsByCustomerId(Long costumerId);
 
+    boolean existsByRoomId(Long roomId);
+
     @Query("SELECT b.room.id FROM Booking b WHERE b.startDate < :endDate AND b.endDate > :startDate")
     List<Long> findBookedRoomIds(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
 

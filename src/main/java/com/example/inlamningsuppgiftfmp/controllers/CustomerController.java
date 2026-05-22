@@ -20,6 +20,7 @@ public class CustomerController {
         this.customerService = customerService;
     }
 
+
     @RequestMapping("/all")
     public String getAll(Model model) {
 
@@ -72,7 +73,7 @@ public class CustomerController {
 
     //update customer: after clicking submit on the form (either edit form or add form, customer is saved and go back to all customers list
     @PostMapping("/update")
-    public String saveEditedCustomer(CustomerDto customerDto) {
+    public String saveCustomer(CustomerDto customerDto) {
         customerService.saveCustomer(customerDto);
         return "redirect:/customer/all";
     }

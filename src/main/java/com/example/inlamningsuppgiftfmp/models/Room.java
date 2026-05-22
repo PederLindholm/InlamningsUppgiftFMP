@@ -1,8 +1,6 @@
 package com.example.inlamningsuppgiftfmp.models;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -16,10 +14,14 @@ public class Room {
     @Id
     @GeneratedValue
     private Long id;
-    private String type;
-    private int maxExtraBed;
 
-    public Room(String type, int maxExtraBed) {
+    @Enumerated(EnumType.STRING)
+    private RoomType type;
+
+    @Enumerated
+    private MaxExtraBed maxExtraBed;
+
+    public Room(RoomType type, MaxExtraBed maxExtraBed) {
         this.type = type;
         this.maxExtraBed = maxExtraBed;
     }
