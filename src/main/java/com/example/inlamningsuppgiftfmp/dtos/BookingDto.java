@@ -1,5 +1,6 @@
 package com.example.inlamningsuppgiftfmp.dtos;
 
+import com.example.inlamningsuppgiftfmp.models.RoomType;
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -18,8 +19,12 @@ public class BookingDto {
     @NotNull
     private Long customerId;
 
+    private String customerName;
+
     @NotNull
     private Long roomId;
+
+    private RoomType roomType;
 
     @NotNull
     private LocalDate startDate;
@@ -27,4 +32,5 @@ public class BookingDto {
     @NotNull
     private LocalDate endDate;
 
+    private Long numberOfNights;
 }
