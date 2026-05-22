@@ -2,6 +2,7 @@ package com.example.inlamningsuppgiftfmp.services;
 
 import com.example.inlamningsuppgiftfmp.dtos.RoomDto;
 import com.example.inlamningsuppgiftfmp.models.Room;
+import com.example.inlamningsuppgiftfmp.models.RoomType;
 import com.example.inlamningsuppgiftfmp.repos.BookingRepo;
 import com.example.inlamningsuppgiftfmp.repos.RoomRepo;
 import org.springframework.stereotype.Service;
@@ -32,10 +33,12 @@ public class RoomService {
     public Optional<RoomDto> getRoomById(Long id) {
         return roomRepo.findById(id).map(this::toDto);
     }
+
     public RoomDto saveRoom(RoomDto dto) {
         Room saved = roomRepo.save(toEntity(dto));
         return toDto(saved);
     }
+
     public Optional<RoomDto> updateRoom(Long id, RoomDto dto) {
         return roomRepo.findById(id).map(existing -> {
             existing.setType(dto.getType());
@@ -43,9 +46,16 @@ public class RoomService {
             return toDto(roomRepo.save(existing));
         });
     }
-    public void deleteRoom(Long id) {
+
+    public boolean deleteRoom(Long id) {
+        boolean hasBookings = bookingRepo.existsByRoomId(id);
+        if (hasBookings) {
+            return false;
+        }
         roomRepo.deleteById(id);
+        return true;
     }
+
     public List<RoomDto> searchAvailableRooms(LocalDate startDate, LocalDate endDate, int guests) {
         List<Long> bookedRoomIds = bookingRepo.findBookedRoomIds(startDate, endDate);
 
@@ -56,9 +66,10 @@ public class RoomService {
                 .map(this::toDto)
                 .toList();
     }
+
     private int getMaxGuests(Room room) {
-        int base = room.getType().equalsIgnoreCase("enkelrum") ? 1 : 2;
-        return base + room.getMaxExtraBed();
+        int base = room.getType().equals(RoomType.SINGLE) ? 1 : 2;
+        return base + room.getMaxExtraBed().getValue();
     }
 
     public RoomDto toDto(Room room) {
