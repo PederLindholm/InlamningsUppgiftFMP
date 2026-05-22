@@ -4,14 +4,12 @@ import com.example.inlamningsuppgiftfmp.models.Customer;
 import com.example.inlamningsuppgiftfmp.repos.CustomerRepo;
 import com.example.inlamningsuppgiftfmp.services.CustomerService;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
+@RequestMapping("customers")
 public class CustomerController {
 
     private final CustomerRepo customerRepo;
@@ -22,23 +20,23 @@ public class CustomerController {
         this.customerService = customerService;
     }
 
-    @RequestMapping("customers")
-    public List<Customer> getAllCustomers(){
+    @GetMapping
+    public List<Customer> getAllCustomers() {
         return customerRepo.findAll();
     }
 
-    @RequestMapping("customers/delete/{id}")
-    public String deleteCustomer(@PathVariable Long id, Model model){
-       boolean deleted = customerService.deleteCustomer(id);
-       if (!deleted){
-        model.addAttribute("error", "Kan inte ta bort kunder med bokningar");
-       }
-       return "redirect:/customers";
+    @RequestMapping("delete/{id}")
+    public String deleteCustomer(@PathVariable Long id, Model model) {
+        boolean deleted = customerService.deleteCustomer(id);
+        if (!deleted) {
+            model.addAttribute("error", "Kan inte ta bort kunder med bokningar");
+        }
+        return "redirect:/customers";
     }
 
-    @RequestMapping("customers/add")
-    public String addCustomer(@RequestParam String name, @RequestParam String email, @RequestParam String tel){
-        customerRepo.save(new Customer(name,email,tel));
+    @PostMapping("add")
+    public String addCustomer(@RequestParam String name, @RequestParam String email, @RequestParam String tel) {
+        customerRepo.save(new Customer(name, email, tel));
         return "Customer " + name + " added";
     }
 }
