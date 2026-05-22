@@ -2,23 +2,22 @@ package com.example.inlamningsuppgiftfmp.dtos;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class RoomDto {
     private Long id;
 
-    @NotBlank(message = "Rumstyp måste anges")
+    @NotBlank(message = "Room type must be filled")
     private String type;
 
-    @Min(value = 0, message = "Antal extrasängar kan inte vara negativt")
+    @Min(value = 0, message = "Number of extra beds cannot be negative")
     private int maxExtraBed;
 
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
-
-    public String getType() { return type; }
-    public void setType(String type) { this.type = type; }
-
-    public int getMaxExtraBed() { return maxExtraBed; }
-    public void setMaxExtraBed(int maxExtraBed) { this.maxExtraBed = maxExtraBed; }
 
 }
