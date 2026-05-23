@@ -6,6 +6,15 @@
 </head>
 <body>
 
+<nav class="navbar">
+    <a class="navbar-brand" >🏨 FMP Inn</a>
+    <div class="navbar-links">
+        <a th:href="@{/customer/all}">Customers</a>
+        <a th:href="@{/room/all}">Rooms</a>
+        <a th:href="@{/booking/all}">Bookings</a>
+    </div>
+</nav>
+
 <h2 th:text="${customerTitle}"></h2>
 
 <div class="allCustomers" th:unless="${#lists.isEmpty(allCustomers)}">
