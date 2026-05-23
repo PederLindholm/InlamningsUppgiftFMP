@@ -16,20 +16,20 @@ public class BookingDto {
 
     private Long id;
 
-    @NotNull
+    @NotNull(message = "Customer must be selected")
     private Long customerId;
 
     private String customerName;
 
-    @NotNull
+    @NotNull(message = "Room must be selected")
     private Long roomId;
 
     private RoomType roomType;
 
-    @NotNull
+    @NotNull(message = "Check-in date must be selected")
     private LocalDate startDate;
 
-    @NotNull
+    @NotNull(message = "Check-out date must be selected")
     private LocalDate endDate;
 
     private Long numberOfNights;

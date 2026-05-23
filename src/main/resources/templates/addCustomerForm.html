@@ -8,14 +8,19 @@
 
 <h2>Create new customer</h2>
 
+<p th:if="${errorMsg}" th:text="${errorMsg}" style="color: red; font-weight: bold;"></p>
 
-<form action="#" th:action="@{/customer/update}" method="post" >
-    <label for="name">Name:</label><br>
-    <input type="text" id="name" name="name" value=""><br><br>
-    <label for="email">Email:</label><br>
-    <input type="text" id="email" name="email" value=""><br><br>
-    <label for="tel">Tel:</label><br>
-    <input type="text" id="tel" name="tel" value=""><br><br>
+<form action="/customer/update" method="post">
+
+    <label>Name:</label><br>
+    <input type="text" name="name"><br><br>
+
+    <label>Email:</label><br>
+    <input type="text" name="email"><br><br>
+
+    <label>Tel:</label><br>
+    <input type="text" name="tel"><br><br>
+
     <input type="submit" value="Submit">
 </form>
 

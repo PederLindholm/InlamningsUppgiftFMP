@@ -4,8 +4,11 @@ import com.example.inlamningsuppgiftfmp.dtos.BookingDto;
 import com.example.inlamningsuppgiftfmp.services.BookingService;
 import com.example.inlamningsuppgiftfmp.services.CustomerService;
 import com.example.inlamningsuppgiftfmp.services.RoomService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -14,17 +17,12 @@ import java.util.Optional;
 
 @Controller
 @RequestMapping(path = "/booking")
+@RequiredArgsConstructor
 public class BookingController {
 
     private final CustomerService customerService;
     private final BookingService bookingService;
     private final RoomService roomService;
-
-    public BookingController(CustomerService customerService, BookingService bookingService, RoomService roomService) {
-        this.customerService = customerService;
-        this.bookingService = bookingService;
-        this.roomService = roomService;
-    }
 
 
     @RequestMapping("/all")
@@ -70,7 +68,15 @@ public class BookingController {
 
 
     @PostMapping("/update")
-    public String updateEditedBooking(BookingDto bookingDto, RedirectAttributes redirectAttributes) {
+    public String updateEditedBooking(@Valid @ModelAttribute("booking") BookingDto bookingDto, BindingResult bindingResult, Model model, RedirectAttributes redirectAttributes) {
+        if (bindingResult.hasErrors()) {
+            String firstError = bindingResult.getFieldErrors().get(0).getDefaultMessage();
+            model.addAttribute("errorMsg", firstError);
+            model.addAttribute("customers", customerService.getAllCustomers());
+            model.addAttribute("rooms", roomService.getAllRooms());
+            return "editBookingForm";
+        }
+
         try {
             bookingService.updateBooking(bookingDto);
             redirectAttributes.addFlashAttribute("success", "Booking updated successfully");
@@ -92,7 +98,15 @@ public class BookingController {
 
 
     @PostMapping("/create")
-    public String createNewBooking(BookingDto bookingDto, RedirectAttributes redirectAttributes) {
+    public String createNewBooking(@Valid @ModelAttribute("booking") BookingDto bookingDto, BindingResult bindingResult, Model model, RedirectAttributes redirectAttributes) {
+        if (bindingResult.hasErrors()) {
+            String firstError = bindingResult.getFieldErrors().get(0).getDefaultMessage();
+            model.addAttribute("errorMsg", firstError);
+            model.addAttribute("customers", customerService.getAllCustomers());
+            model.addAttribute("rooms", roomService.getAllRooms());
+            return "addBookingForm";
+        }
+
         try {
             bookingService.createBooking(bookingDto);
             redirectAttributes.addFlashAttribute("success", "Booking created successfully");

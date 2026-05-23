@@ -8,10 +8,11 @@
 
 <h2>Edit an existing booking</h2>
 
-<form action="#" th:action="@{/booking/update}" th:object="${booking}"  method="post" >
+<p th:if="${errorMsg}" th:text="${errorMsg}" style="color: red; font-weight: bold;"></p>
+
+<form th:action="@{/booking/update}" th:object="${booking}" method="post">
 
     <label for="customerId">Customer:</label><br>
-
     <select id="customerId" th:field="*{customerId}">
         <option th:each="customer : ${customers}"
                 th:value="${customer.id}"
@@ -38,7 +39,8 @@
     <input type="date" id="endDate" th:field="*{endDate}"><br>
 
     <input type=hidden id="id" th:field="*{id}"><br>
-    <input type="submit" value="Submit">
+
+    <input type="submit" value="Submit"><br>
 </form>
 
 </body>
