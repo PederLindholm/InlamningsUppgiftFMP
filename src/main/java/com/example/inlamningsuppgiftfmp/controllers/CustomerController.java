@@ -51,7 +51,7 @@ public class CustomerController {
        return "redirect:/customer/all";
     }
 
-    //edit customer: clicking on "edit" button and the site will go to a form to edit customer's info
+
     @RequestMapping("/edit/{id}")
     public String createEditCustomerForm(@PathVariable Long id, Model model) {
         Optional<CustomerDto> optionalCustomer = customerService.getCustomerByID(id);
@@ -77,13 +77,13 @@ public class CustomerController {
         return "redirect:/customer/all";
     }
 
-    //adding new customer, when clicking on "Add new customer", this function send out a form to fill in info
+
     @RequestMapping("/new")
     public String createAddCustomerForm() {
         return "addCustomerForm";
     }
 
-    //update customer: after clicking submit on the form (either edit form or add form, customer is saved and go back to all customers list
+
     @PostMapping("/update")
     public String updateCustomer(@Valid CustomerDto customerDto, BindingResult bindingResult, Model model) {
         if (bindingResult.hasErrors()) {
