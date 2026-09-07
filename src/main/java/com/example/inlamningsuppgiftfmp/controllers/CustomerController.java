@@ -3,10 +3,14 @@ package com.example.inlamningsuppgiftfmp.controllers;
 import com.example.inlamningsuppgiftfmp.dtos.CustomerDto;
 import com.example.inlamningsuppgiftfmp.services.CustomerService;
 import jakarta.validation.Valid;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
@@ -22,13 +26,18 @@ public class CustomerController {
         this.customerService = customerService;
     }
 
+    RestTemplate restTemplate = new RestTemplate();
 
-    @RequestMapping("/all")
+    @GetMapping("/all")
     public String getAll(Model model) {
+        ResponseEntity<List<CustomerDto>> response = restTemplate.exchange(
+                "http://customerservice:8081/customers/all",
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<List<CustomerDto>>() {}
+        );
 
-        List<CustomerDto> customerDtoList = customerService.getAllCustomers();
-
-        model.addAttribute("allCustomers", customerDtoList);
+        model.addAttribute("allCustomers", response.getBody());
         model.addAttribute("name", "Name");
         model.addAttribute("email", "Email");
         model.addAttribute("tel", "Tel");
