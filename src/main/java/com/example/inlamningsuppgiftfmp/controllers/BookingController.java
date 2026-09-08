@@ -6,15 +6,21 @@ import com.example.inlamningsuppgiftfmp.services.CustomerService;
 import com.example.inlamningsuppgiftfmp.services.RoomService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping(path = "/booking")
@@ -26,10 +32,40 @@ public class BookingController {
     private final RoomService roomService;
 
 
+    RestTemplate restTemplate = new RestTemplate();
+
+
     @RequestMapping("/all")
     public String getAllBooking(Model model) {
 
         List<BookingDto> bookingDtoList = bookingService.getAllBookings();
+
+        try {
+            // getting all the information of all customers:
+            ResponseEntity<List<Map<String, Object>>> response = restTemplate.exchange(
+                    "http://customerservice:8081/customers/all",
+                    HttpMethod.GET,
+                    null,
+                    new ParameterizedTypeReference<List<Map<String, Object>>>() {}
+            );
+            List<Map<String, Object>> customers = response.getBody();
+
+            // mapping the customer's information into a map with id and name:
+            Map<Long, String> customerNames = customers.stream()
+                    .collect(Collectors.toMap(
+                            c -> Long.valueOf(c.get("id").toString()),
+                            c -> (String) c.get("name")
+                    ));
+
+            // adding the name to the list of bookings:
+            bookingDtoList.forEach(b ->
+                    b.setCustomerName(customerNames.getOrDefault(b.getCustomerId(), "Unknown"))
+            );
+        } catch (RestClientException e) {        // if customer-service is down — show IDs instead of crashing the whole page
+            bookingDtoList.forEach(b ->
+                    b.setCustomerName("Customer #" + b.getCustomerId() + " (unavailable)")
+            );
+        }
 
         model.addAttribute("allBookings", bookingDtoList);
         model.addAttribute("customerName", "Customer Name");

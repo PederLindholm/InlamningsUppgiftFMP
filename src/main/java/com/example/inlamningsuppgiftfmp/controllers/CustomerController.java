@@ -69,17 +69,6 @@ public class CustomerController {
        return "redirect:/customer/all";
     }
 
-//    public String deleteCustomer(@PathVariable Long id, RedirectAttributes redirectAttributes){
-//        boolean deleted = customerService.deleteCustomer(id);
-//
-//        if (!deleted){
-//            redirectAttributes.addFlashAttribute("error", "Cannot delete customer with existing bookings");
-//        } else {
-//            redirectAttributes.addFlashAttribute("success", "Customer deleted successfully");
-//        }
-//        return "redirect:/customer/all";
-//    }
-
 
     @RequestMapping("/edit/{id}")
     public String createEditCustomerForm(@PathVariable Long id, Model model) {
