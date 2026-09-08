@@ -17,7 +17,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
+
 
 @Controller
 @RequestMapping(path = "/customer")
@@ -72,27 +72,56 @@ public class CustomerController {
 
     @RequestMapping("/edit/{id}")
     public String createEditCustomerForm(@PathVariable Long id, Model model) {
-        Optional<CustomerDto> optionalCustomer = customerService.getCustomerByID(id);
 
-        if (optionalCustomer.isEmpty()) {
+        try {
+            CustomerDto customer = restTemplate.getForObject(
+                    "http://customerservice:8081/customers/" + id,
+                    CustomerDto.class
+            );
+        model.addAttribute("customerDto", customer);
+        return "editCustomerForm";
+
+        } catch (HttpClientErrorException.NotFound e) {
             model.addAttribute("error", "Customer not found");
             return "redirect:/customer/all";
+
+        } catch (RestClientException e) {
+            model.addAttribute("error", "Customer service is currently unavailable. Please try again later.");
+            return "redirect:/customer/all";
         }
-
-        model.addAttribute("customer", optionalCustomer.get());
-
-        return "editCustomerForm";
+        
     }
 
     @PostMapping("/save")
     public String saveCustomer(@Valid CustomerDto customerDto, BindingResult bindingResult, Model model) {
+
         if (bindingResult.hasErrors()) {
             String firstError = bindingResult.getFieldErrors().get(0).getDefaultMessage();
             model.addAttribute("errorMsg", firstError);
             return "editCustomerForm";
         }
-        customerService.saveCustomer(customerDto);
+
+        try {
+            System.out.println("===== SENDING CUSTOMER =====");
+            System.out.println("ID: " + customerDto.getId());
+            System.out.println("Name: " + customerDto.getName());
+            System.out.println("Email: " + customerDto.getEmail());
+            System.out.println("Tel: " + customerDto.getTel());
+
+            restTemplate.put(
+                    "http://customerservice:8081/customers",
+                    customerDto
+            );
+        } catch (HttpClientErrorException e) {
+            model.addAttribute("errorMsg", "Could not update customer: " + e.getStatusCode());
+            return "editCustomerForm";
+        } catch (RestClientException e) {
+            model.addAttribute("errorMsg", "Customer service is currently unavailable. Please try again later.");
+            return "editCustomerForm";
+        }
+
         return "redirect:/customer/all";
+
     }
 
 

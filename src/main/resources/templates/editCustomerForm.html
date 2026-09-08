@@ -20,7 +20,7 @@
 
 <p th:if="${errorMsg}" th:text="${errorMsg}" style="color: red; font-weight: bold;"></p>
 
-<form th:action="@{/customer/save}" th:object="${customer}" method="post">
+<form th:action="@{/customer/save}" th:object="${customerDto}" method="post">
 
     <label for="name">Name:</label><br>
     <input type="text" th:field="*{name}"
@@ -37,7 +37,7 @@
            th:class="${#fields.hasErrors('tel')}? fieldError"
            id="tel" name="tel" th:value="${customer?.tel}"><br><br>
 
-    <input type="hidden" id="id" name="id" th:value="${customer?.id}">
+    <input type="hidden" th:field="*{id}">
 
     <input type="submit" value="Submit">
 </form>
