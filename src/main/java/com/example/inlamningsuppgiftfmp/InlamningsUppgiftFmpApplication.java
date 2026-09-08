@@ -41,9 +41,9 @@ public class InlamningsUppgiftFmpApplication {
             roomRepo.save(r4);
             roomRepo.save(r5);
 
-            Booking b1 = new Booking(c1,r5, LocalDate.of(2026,05,30),LocalDate.of(2026,06,15));
-            Booking b2 = new Booking(c2,r4, LocalDate.of(2026,06,01),LocalDate.of(2026,06,10));
-            Booking b3 = new Booking(c3,r2, LocalDate.of(2026,10,18),LocalDate.of(2026,12,5));
+            Booking b1 = new Booking(1L,r5, LocalDate.of(2026,05,30),LocalDate.of(2026,06,15));
+            Booking b2 = new Booking(2L,r4, LocalDate.of(2026,06,01),LocalDate.of(2026,06,10));
+            Booking b3 = new Booking(3L,r2, LocalDate.of(2026,10,18),LocalDate.of(2026,12,5));
 
             bookingRepo.save(b1);
             bookingRepo.save(b2);

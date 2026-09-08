@@ -20,8 +20,6 @@ services:
     depends_on:
       pensionat:
         condition: service_healthy
-      customer-db:
-        condition: service_healthy
     environment:
       SPRING_DATASOURCE_URL: jdbc:mysql://pensionat:3306/pensionat
       SPRING_DATASOURCE_USERNAME: root

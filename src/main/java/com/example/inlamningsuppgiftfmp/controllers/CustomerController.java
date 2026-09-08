@@ -10,10 +10,13 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Controller
@@ -30,11 +33,11 @@ public class CustomerController {
 
     @GetMapping("/all")
     public String getAll(Model model) {
-        ResponseEntity<List<CustomerDto>> response = restTemplate.exchange(
+        ResponseEntity<List<Map<String, Object>>> response = restTemplate.exchange(
                 "http://customerservice:8081/customers/all",
                 HttpMethod.GET,
                 null,
-                new ParameterizedTypeReference<List<CustomerDto>>() {}
+                new ParameterizedTypeReference<List<Map<String, Object>>>() {}
         );
 
         model.addAttribute("allCustomers", response.getBody());
@@ -49,16 +52,33 @@ public class CustomerController {
 
     @RequestMapping("/delete/{id}")
     public String deleteCustomer(@PathVariable Long id, RedirectAttributes redirectAttributes){
-       boolean deleted = customerService.deleteCustomer(id);
-
-       if (!deleted){
-           redirectAttributes.addFlashAttribute("error", "Cannot delete customer with existing bookings");
-       } else {
-           redirectAttributes.addFlashAttribute("success", "Customer deleted successfully");
-       }
+        try {
+            restTemplate.exchange(
+                    "http://customerservice:8081/customers/" + id,
+                    HttpMethod.DELETE,
+                    null,
+                    Void.class
+            );
+            redirectAttributes.addFlashAttribute("success", "Customer deleted successfully");
+        } catch (HttpClientErrorException.Conflict e) {
+            redirectAttributes.addFlashAttribute("error", "Cannot delete customer with existing bookings");
+        } catch (RestClientException e) {
+            redirectAttributes.addFlashAttribute("error", "Customer service is currently unavailable. Please try again later.");
+        }
 
        return "redirect:/customer/all";
     }
+
+//    public String deleteCustomer(@PathVariable Long id, RedirectAttributes redirectAttributes){
+//        boolean deleted = customerService.deleteCustomer(id);
+//
+//        if (!deleted){
+//            redirectAttributes.addFlashAttribute("error", "Cannot delete customer with existing bookings");
+//        } else {
+//            redirectAttributes.addFlashAttribute("success", "Customer deleted successfully");
+//        }
+//        return "redirect:/customer/all";
+//    }
 
 
     @RequestMapping("/edit/{id}")

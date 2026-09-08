@@ -6,6 +6,7 @@ import com.example.inlamningsuppgiftfmp.services.CustomerService;
 import com.example.inlamningsuppgiftfmp.services.RoomService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -49,6 +50,11 @@ public class BookingController {
         return "redirect:/booking/all";
     }
 
+    @GetMapping("/customer/{id}/exists")
+    public ResponseEntity<Boolean> bookingExists(@PathVariable Long id) {
+        boolean exists = bookingService.bookingExist(id);
+        return ResponseEntity.ok(exists);
+    }
 
     @RequestMapping("/edit/{id}")
     public String createEditBookingForm(@PathVariable Long id, Model model) {
@@ -67,25 +73,25 @@ public class BookingController {
     }
 
 
-    @PostMapping("/update")
-    public String updateEditedBooking(@Valid @ModelAttribute("booking") BookingDto bookingDto, BindingResult bindingResult, Model model, RedirectAttributes redirectAttributes) {
-        if (bindingResult.hasErrors()) {
-            String firstError = bindingResult.getFieldErrors().get(0).getDefaultMessage();
-            model.addAttribute("errorMsg", firstError);
-            model.addAttribute("customers", customerService.getAllCustomers());
-            model.addAttribute("rooms", roomService.getAllRooms());
-            return "editBookingForm";
-        }
-
-        try {
-            bookingService.updateBooking(bookingDto);
-            redirectAttributes.addFlashAttribute("success", "Booking updated successfully");
-        } catch (RuntimeException e) {
-            redirectAttributes.addFlashAttribute("error", e.getMessage());
-        }
-
-        return "redirect:/booking/all";
-    }
+//    @PostMapping("/update")
+//    public String updateEditedBooking(@Valid @ModelAttribute("booking") BookingDto bookingDto, BindingResult bindingResult, Model model, RedirectAttributes redirectAttributes) {
+//        if (bindingResult.hasErrors()) {
+//            String firstError = bindingResult.getFieldErrors().get(0).getDefaultMessage();
+//            model.addAttribute("errorMsg", firstError);
+//            model.addAttribute("customers", customerService.getAllCustomers());
+//            model.addAttribute("rooms", roomService.getAllRooms());
+//            return "editBookingForm";
+//        }
+//
+//        try {
+//            bookingService.updateBooking(bookingDto);
+//            redirectAttributes.addFlashAttribute("success", "Booking updated successfully");
+//        } catch (RuntimeException e) {
+//            redirectAttributes.addFlashAttribute("error", e.getMessage());
+//        }
+//
+//        return "redirect:/booking/all";
+//    }
 
 
     @RequestMapping("/new")
@@ -97,24 +103,25 @@ public class BookingController {
     }
 
 
-    @PostMapping("/create")
-    public String createNewBooking(@Valid @ModelAttribute("booking") BookingDto bookingDto, BindingResult bindingResult, Model model, RedirectAttributes redirectAttributes) {
-        if (bindingResult.hasErrors()) {
-            String firstError = bindingResult.getFieldErrors().get(0).getDefaultMessage();
-            model.addAttribute("errorMsg", firstError);
-            model.addAttribute("customers", customerService.getAllCustomers());
-            model.addAttribute("rooms", roomService.getAllRooms());
-            return "addBookingForm";
-        }
+//    @PostMapping("/create")
+//    public String createNewBooking(@Valid @ModelAttribute("booking") BookingDto bookingDto, BindingResult bindingResult, Model model, RedirectAttributes redirectAttributes) {
+//        if (bindingResult.hasErrors()) {
+//            String firstError = bindingResult.getFieldErrors().get(0).getDefaultMessage();
+//            model.addAttribute("errorMsg", firstError);
+//            model.addAttribute("customers", customerService.getAllCustomers());
+//            model.addAttribute("rooms", roomService.getAllRooms());
+//            return "addBookingForm";
+//        }
+//
+//        try {
+//            bookingService.createBooking(bookingDto);
+//            redirectAttributes.addFlashAttribute("success", "Booking created successfully");
+//        } catch (RuntimeException e) {
+//            redirectAttributes.addFlashAttribute("error", e.getMessage());
+//        }
+//
+//        return "redirect:/booking/all";
+//    }
 
-        try {
-            bookingService.createBooking(bookingDto);
-            redirectAttributes.addFlashAttribute("success", "Booking created successfully");
-        } catch (RuntimeException e) {
-            redirectAttributes.addFlashAttribute("error", e.getMessage());
-        }
-
-        return "redirect:/booking/all";
-    }
 
 }
