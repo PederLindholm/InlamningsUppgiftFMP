@@ -132,8 +132,22 @@ public class CustomerController {
             model.addAttribute("errorMsg", firstError);
             return "addCustomerForm";
         }
-        customerService.saveCustomer(customerDto);
+
+        try {
+            restTemplate.postForObject(
+                    "http://customerservice:8081/customers",
+                    customerDto, CustomerDto.class
+            );
+        } catch (HttpClientErrorException e) {
+            model.addAttribute("errorMsg", "Could not update new customer: " + e.getStatusCode());
+            return "addCustomerForm";
+        } catch (RestClientException e) {
+            model.addAttribute("errorMsg", "Customer service is currently unavailable. Please try again later.");
+            return "addCustomerForm";
+        }
+
         return "redirect:/customer/all";
+
     }
 
 }
