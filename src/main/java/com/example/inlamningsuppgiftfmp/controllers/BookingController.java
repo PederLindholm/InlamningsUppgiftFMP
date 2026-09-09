@@ -29,9 +29,8 @@ public class BookingController {
 
     private final BookingService bookingService;
     private final RoomService roomService;
+    private final RestTemplate restTemplate;
 
-
-    RestTemplate restTemplate = new RestTemplate();
 
 
     @RequestMapping("/all")

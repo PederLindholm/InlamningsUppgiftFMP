@@ -14,6 +14,7 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.security.PrivateKey;
 import java.util.List;
 import java.util.Map;
 
@@ -23,7 +24,11 @@ import java.util.Map;
 public class CustomerController {
 
 
-    RestTemplate restTemplate = new RestTemplate();
+    private final RestTemplate restTemplate;
+
+    public CustomerController(RestTemplate restTemplate) {
+        this.restTemplate = restTemplate;
+    }
 
     @GetMapping("/all")
     public String getAll(Model model) {
