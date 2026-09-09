@@ -31,21 +31,27 @@ public class CustomerController {
     }
 
     @GetMapping("/all")
-    public String getAll(Model model) {
-        ResponseEntity<List<Map<String, Object>>> response = restTemplate.exchange(
-                "http://customerservice:8081/customers/all",
-                HttpMethod.GET,
-                null,
-                new ParameterizedTypeReference<List<Map<String, Object>>>() {}
-        );
+    public String getAll(Model model, RedirectAttributes redirectAttributes) {
+        try {
+            ResponseEntity<List<Map<String, Object>>> response = restTemplate.exchange(
+                    "http://customerservice:8081/customers/all",
+                    HttpMethod.GET,
+                    null,
+                    new ParameterizedTypeReference<List<Map<String, Object>>>() {}
+            );
 
-        model.addAttribute("allCustomers", response.getBody());
-        model.addAttribute("name", "Name");
-        model.addAttribute("email", "Email");
-        model.addAttribute("tel", "Tel");
-        model.addAttribute("customerTitle", "All Customers");
+            model.addAttribute("allCustomers", response.getBody());
+            model.addAttribute("name", "Name");
+            model.addAttribute("email", "Email");
+            model.addAttribute("tel", "Tel");
+            model.addAttribute("customerTitle", "All Customers");
 
-        return "customer";
+            return "customer";
+        } catch (RestClientException e) {
+            redirectAttributes.addFlashAttribute("error", "Customer service is currently unavailable. Please try again later.");
+            return "redirect:/booking/all";
+        }
+
     }
 
 
