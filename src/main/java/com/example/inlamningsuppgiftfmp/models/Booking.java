@@ -11,10 +11,6 @@ public class Booking {
     @GeneratedValue
     private Long id;
 
-//    @ManyToOne
-//    @JoinColumn
-//    private Customer customer;  //TO DO: to remove this and replace with customer ID
-
     private Long customerId;
 
     @ManyToOne
@@ -27,7 +23,6 @@ public class Booking {
     public Booking(){}
 
     public Booking(Long customerId, Room room, LocalDate startDate, LocalDate endDate) {
-        //this.customer = customer;
         this.customerId = customerId;
         this.room = room;
         this.startDate = startDate;
@@ -49,14 +44,6 @@ public class Booking {
     public void setCustomerId(Long customerId) {
         this.customerId = customerId;
     }
-
-    //    public Customer getCustomer() {
-//        return customer;
-//    }
-//
-//    public void setCustomer(Customer customer) {
-//        this.customer = customer;
-//    }
 
     public Room getRoom() {
         return room;

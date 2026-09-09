@@ -2,10 +2,8 @@ package com.example.inlamningsuppgiftfmp.services;
 
 import com.example.inlamningsuppgiftfmp.dtos.BookingDto;
 import com.example.inlamningsuppgiftfmp.models.Booking;
-import com.example.inlamningsuppgiftfmp.models.Customer;
 import com.example.inlamningsuppgiftfmp.models.Room;
 import com.example.inlamningsuppgiftfmp.repos.BookingRepo;
-import com.example.inlamningsuppgiftfmp.repos.CustomerRepo;
 import com.example.inlamningsuppgiftfmp.repos.RoomRepo;
 import org.springframework.stereotype.Service;
 
@@ -17,12 +15,10 @@ import java.time.temporal.ChronoUnit;
 public class BookingService {
 
     private final BookingRepo bookingRepo;
-    private final CustomerRepo customerRepo;
     private final RoomRepo roomRepo;
 
-    public BookingService(BookingRepo bookingRepo, CustomerRepo customerRepo, RoomRepo roomRepo) {
+    public BookingService(BookingRepo bookingRepo, RoomRepo roomRepo) {
         this.bookingRepo = bookingRepo;
-        this.customerRepo = customerRepo;
         this.roomRepo = roomRepo;
     }
 
@@ -38,84 +34,75 @@ public class BookingService {
                 .map(this::toDto);
     }
 
-//    TO DO: to fix this with customerID instead of customer entity
-//    public BookingDto createBooking(BookingDto bookingDto) {
-//
-//        Long customerID =
-//
-//        Customer customer = customerRepo.findById(bookingDto.getCustomerId())
-//                .orElseThrow(() -> new RuntimeException("Customer not found"));
-//
-//        Room room = roomRepo.findById(bookingDto.getRoomId())
-//                .orElseThrow(() -> new RuntimeException("Room not found"));
-//
-//        boolean overlaps = bookingRepo.existsOverlappingBooking(
-//                room.getId(),
-//                bookingDto.getStartDate(),
-//                bookingDto.getEndDate()
-//        );
-//
-//        if (overlaps) {
-//            throw new RuntimeException("Room is already booked for selected date");
-//        }
-//
-//        if (bookingDto.getStartDate().isAfter(bookingDto.getEndDate()) ||
-//                bookingDto.getStartDate().isEqual(bookingDto.getEndDate())) {
-//
-//            throw new RuntimeException("Check-in date must be before check-out date");
-//        }
-//
-//        Booking booking = new Booking();
-//        booking.setCustomerID(customerID);
-//        //booking.setCustomer(customer);
-//        booking.setRoom(room);
-//        booking.setStartDate(bookingDto.getStartDate());
-//        booking.setEndDate(bookingDto.getEndDate());
-//
-//        return toDto(bookingRepo.save(booking));
-//    }
-//
-//
-//    public Optional<BookingDto> updateBooking(BookingDto bookingDto) {
-//
-//        return bookingRepo.findById(bookingDto.getId()).map(existing -> {
-//
-//            Customer customer = customerRepo.findById(bookingDto.getCustomerId())
-//                    .orElseThrow();
-//
-//            Room room = roomRepo.findById(bookingDto.getRoomId())
-//                    .orElseThrow();
-//
-//
-//            boolean overlaps = bookingRepo.existsOverlappingBookingExcludingCurrent(
-//                    room.getId(),
-//                    bookingDto.getId(),
-//                    bookingDto.getStartDate(),
-//                    bookingDto.getEndDate()
-//            );
-//
-//            if (overlaps &&
-//                    !(existing.getRoom().getId().equals(room.getId())
-//                            && existing.getStartDate().equals(bookingDto.getStartDate())
-//                            && existing.getEndDate().equals(bookingDto.getEndDate()))) {
-//
-//                throw new RuntimeException("Room is already booked for selected date");
-//            }
-//
-//            if (bookingDto.getStartDate().isAfter(bookingDto.getEndDate()) ||
-//                    bookingDto.getStartDate().isEqual(bookingDto.getEndDate())) {
-//
-//                throw new RuntimeException("Check-in date must be before check-out date");
-//            }
-//
-//            existing.setCustomer(customer);
-//            existing.setRoom(room);
-//            existing.setStartDate(bookingDto.getStartDate());
-//            existing.setEndDate(bookingDto.getEndDate());
-//
-//            return toDto(bookingRepo.save(existing));
-//        });
-//    }
+
+    public BookingDto createBooking(BookingDto bookingDto) {
+
+        Room room = roomRepo.findById(bookingDto.getRoomId())
+                .orElseThrow(() -> new RuntimeException("Room not found"));
+
+        boolean overlaps = bookingRepo.existsOverlappingBooking(
+                room.getId(),
+                bookingDto.getStartDate(),
+                bookingDto.getEndDate()
+        );
+
+        if (overlaps) {
+            throw new RuntimeException("Room is already booked for selected date");
+        }
+
+        if (bookingDto.getStartDate().isAfter(bookingDto.getEndDate()) ||
+                bookingDto.getStartDate().isEqual(bookingDto.getEndDate())) {
+
+            throw new RuntimeException("Check-in date must be before check-out date");
+        }
+
+        Booking booking = new Booking();
+        booking.setCustomerId(bookingDto.getCustomerId());
+        booking.setRoom(room);
+        booking.setStartDate(bookingDto.getStartDate());
+        booking.setEndDate(bookingDto.getEndDate());
+
+        return toDto(bookingRepo.save(booking));
+    }
+
+
+    public Optional<BookingDto> updateBooking(BookingDto bookingDto) {
+
+        return bookingRepo.findById(bookingDto.getId()).map(existing -> {
+
+            Room room = roomRepo.findById(bookingDto.getRoomId())
+                    .orElseThrow();
+
+
+            boolean overlaps = bookingRepo.existsOverlappingBookingExcludingCurrent(
+                    room.getId(),
+                    bookingDto.getId(),
+                    bookingDto.getStartDate(),
+                    bookingDto.getEndDate()
+            );
+
+            if (overlaps &&
+                    !(existing.getRoom().getId().equals(room.getId())
+                            && existing.getStartDate().equals(bookingDto.getStartDate())
+                            && existing.getEndDate().equals(bookingDto.getEndDate()))) {
+
+                throw new RuntimeException("Room is already booked for selected date");
+            }
+
+            if (bookingDto.getStartDate().isAfter(bookingDto.getEndDate()) ||
+                    bookingDto.getStartDate().isEqual(bookingDto.getEndDate())) {
+
+                throw new RuntimeException("Check-in date must be before check-out date");
+            }
+
+            existing.setCustomerId(bookingDto.getCustomerId());
+            existing.setRoom(room);
+            existing.setStartDate(bookingDto.getStartDate());
+            existing.setEndDate(bookingDto.getEndDate());
+
+            return toDto(bookingRepo.save(existing));
+        });
+    }
 
 
     public void deleteBooking(Long id) {
@@ -132,7 +119,6 @@ public class BookingService {
 
         dto.setId(booking.getId());
         dto.setCustomerId(booking.getCustomerId());
-        //dto.setCustomerName(booking.getCustomerName();
         dto.setRoomId(booking.getRoom().getId());
         dto.setRoomType(booking.getRoom().getType());
         dto.setStartDate(booking.getStartDate());

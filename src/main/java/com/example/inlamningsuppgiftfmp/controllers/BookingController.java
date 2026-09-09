@@ -2,7 +2,6 @@ package com.example.inlamningsuppgiftfmp.controllers;
 
 import com.example.inlamningsuppgiftfmp.dtos.BookingDto;
 import com.example.inlamningsuppgiftfmp.services.BookingService;
-import com.example.inlamningsuppgiftfmp.services.CustomerService;
 import com.example.inlamningsuppgiftfmp.services.RoomService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +12,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -27,7 +27,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class BookingController {
 
-    private final CustomerService customerService;
     private final BookingService bookingService;
     private final RoomService roomService;
 
@@ -86,11 +85,13 @@ public class BookingController {
         return "redirect:/booking/all";
     }
 
+    // customer service calls this function to check if a customer has an existing booking before deleting
     @GetMapping("/customer/{id}/exists")
     public ResponseEntity<Boolean> bookingExists(@PathVariable Long id) {
         boolean exists = bookingService.bookingExist(id);
         return ResponseEntity.ok(exists);
     }
+
 
     @RequestMapping("/edit/{id}")
     public String createEditBookingForm(@PathVariable Long id, Model model) {
@@ -101,7 +102,19 @@ public class BookingController {
             return "redirect:/booking/all";
         }
 
-        model.addAttribute("customers", customerService.getAllCustomers());
+        try {
+            ResponseEntity<List<Map<String, Object>>> response = restTemplate.exchange(
+                    "http://customerservice:8081/customers/all",
+                    HttpMethod.GET,
+                    null,
+                    new ParameterizedTypeReference<List<Map<String, Object>>>() {}
+            );
+            model.addAttribute("customers", response.getBody());
+        } catch (RestClientException e) {
+            model.addAttribute("customers", List.of());
+            model.addAttribute("error", "Customer service is currently unavailable — cannot load customer list.");
+        }
+
         model.addAttribute("rooms", roomService.getAllRooms());
         model.addAttribute("booking", optionalBooking.get());
 
@@ -109,55 +122,117 @@ public class BookingController {
     }
 
 
-//    @PostMapping("/update")
-//    public String updateEditedBooking(@Valid @ModelAttribute("booking") BookingDto bookingDto, BindingResult bindingResult, Model model, RedirectAttributes redirectAttributes) {
-//        if (bindingResult.hasErrors()) {
-//            String firstError = bindingResult.getFieldErrors().get(0).getDefaultMessage();
-//            model.addAttribute("errorMsg", firstError);
-//            model.addAttribute("customers", customerService.getAllCustomers());
-//            model.addAttribute("rooms", roomService.getAllRooms());
-//            return "editBookingForm";
-//        }
-//
-//        try {
-//            bookingService.updateBooking(bookingDto);
-//            redirectAttributes.addFlashAttribute("success", "Booking updated successfully");
-//        } catch (RuntimeException e) {
-//            redirectAttributes.addFlashAttribute("error", e.getMessage());
-//        }
-//
-//        return "redirect:/booking/all";
-//    }
+    @PostMapping("/update")
+    public String updateEditedBooking(@Valid @ModelAttribute("booking") BookingDto bookingDto, BindingResult bindingResult, Model model, RedirectAttributes redirectAttributes) {
+        if (bindingResult.hasErrors()) {
+            String firstError = bindingResult.getFieldErrors().get(0).getDefaultMessage();
+            model.addAttribute("errorMsg", firstError);
+            model.addAttribute("customers", fetchAllCustomersOrEmpty(model));
+            model.addAttribute("rooms", roomService.getAllRooms());
+            return "editBookingForm";
+        }
+
+        try {
+            boolean customerExists = restTemplate.getForObject(
+                    "http://customerservice:8081/customers/" + bookingDto.getCustomerId(),
+                    Object.class
+            ) != null;
+
+            if (!customerExists) {
+                model.addAttribute("errorMsg", "Selected customer does not exist.");
+                model.addAttribute("customers", fetchAllCustomersOrEmpty(model));
+                model.addAttribute("rooms", roomService.getAllRooms());
+                return "editBookingForm";
+            }
+        } catch (HttpClientErrorException.NotFound e) {
+            model.addAttribute("errorMsg", "Selected customer does not exist.");
+            model.addAttribute("customers", fetchAllCustomersOrEmpty(model));
+            model.addAttribute("rooms", roomService.getAllRooms());
+            return "editBookingForm";
+        } catch (RestClientException e) {
+            model.addAttribute("errorMsg", "Customer service is currently unavailable. Please try again later.");
+            model.addAttribute("customers", fetchAllCustomersOrEmpty(model));
+            model.addAttribute("rooms", roomService.getAllRooms());
+            return "editBookingForm";
+        }
+
+        try {
+            bookingService.updateBooking(bookingDto);
+            redirectAttributes.addFlashAttribute("success", "Booking updated successfully");
+        } catch (RuntimeException e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+        }
+
+        return "redirect:/booking/all";
+    }
+
+    private List<Map<String, Object>> fetchAllCustomersOrEmpty(Model model) {
+        try {
+            ResponseEntity<List<Map<String, Object>>> response = restTemplate.exchange(
+                    "http://customerservice:8081/customers/all",
+                    HttpMethod.GET,
+                    null,
+                    new ParameterizedTypeReference<List<Map<String, Object>>>() {}
+            );
+            return response.getBody();
+        } catch (RestClientException e) {
+            return List.of();
+        }
+    }
 
 
     @RequestMapping("/new")
     public String createAddBookingForm(Model model) {
-        model.addAttribute("customers", customerService.getAllCustomers());
+        model.addAttribute("customers", fetchAllCustomersOrEmpty(model));
         model.addAttribute("rooms", roomService.getAllRooms());
         model.addAttribute("booking", new BookingDto());
         return "addBookingForm";
     }
 
 
-//    @PostMapping("/create")
-//    public String createNewBooking(@Valid @ModelAttribute("booking") BookingDto bookingDto, BindingResult bindingResult, Model model, RedirectAttributes redirectAttributes) {
-//        if (bindingResult.hasErrors()) {
-//            String firstError = bindingResult.getFieldErrors().get(0).getDefaultMessage();
-//            model.addAttribute("errorMsg", firstError);
-//            model.addAttribute("customers", customerService.getAllCustomers());
-//            model.addAttribute("rooms", roomService.getAllRooms());
-//            return "addBookingForm";
-//        }
-//
-//        try {
-//            bookingService.createBooking(bookingDto);
-//            redirectAttributes.addFlashAttribute("success", "Booking created successfully");
-//        } catch (RuntimeException e) {
-//            redirectAttributes.addFlashAttribute("error", e.getMessage());
-//        }
-//
-//        return "redirect:/booking/all";
-//    }
+    @PostMapping("/create")
+    public String createNewBooking(@Valid @ModelAttribute("booking") BookingDto bookingDto, BindingResult bindingResult, Model model, RedirectAttributes redirectAttributes) {
+        if (bindingResult.hasErrors()) {
+            String firstError = bindingResult.getFieldErrors().get(0).getDefaultMessage();
+            model.addAttribute("errorMsg", firstError);
+            model.addAttribute("customers", fetchAllCustomersOrEmpty(model));
+            model.addAttribute("rooms", roomService.getAllRooms());
+            return "addBookingForm";
+        }
+
+        try {
+            boolean customerExists = restTemplate.getForObject(
+                    "http://customerservice:8081/customers/" + bookingDto.getCustomerId(),
+                    Object.class
+            ) != null;
+
+            if (!customerExists) {
+                model.addAttribute("errorMsg", "Selected customer does not exist.");
+                model.addAttribute("customers", fetchAllCustomersOrEmpty(model));
+                model.addAttribute("rooms", roomService.getAllRooms());
+                return "addBookingForm";
+            }
+        } catch (HttpClientErrorException.NotFound e) {
+            model.addAttribute("errorMsg", "Selected customer does not exist.");
+            model.addAttribute("customers", fetchAllCustomersOrEmpty(model));
+            model.addAttribute("rooms", roomService.getAllRooms());
+            return "addBookingForm";
+        } catch (RestClientException e) {
+            model.addAttribute("errorMsg", "Customer service is currently unavailable. Please try again later.");
+            model.addAttribute("customers", fetchAllCustomersOrEmpty(model));
+            model.addAttribute("rooms", roomService.getAllRooms());
+            return "addBookingForm";
+        }
+
+        try {
+            bookingService.createBooking(bookingDto);
+            redirectAttributes.addFlashAttribute("success", "Booking created successfully");
+        } catch (RuntimeException e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+        }
+
+        return "redirect:/booking/all";
+    }
 
 
 }

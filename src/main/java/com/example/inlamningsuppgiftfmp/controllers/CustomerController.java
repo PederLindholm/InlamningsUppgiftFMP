@@ -1,7 +1,6 @@
 package com.example.inlamningsuppgiftfmp.controllers;
 
 import com.example.inlamningsuppgiftfmp.dtos.CustomerDto;
-import com.example.inlamningsuppgiftfmp.services.CustomerService;
 import jakarta.validation.Valid;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
@@ -23,11 +22,6 @@ import java.util.Map;
 @RequestMapping(path = "/customer")
 public class CustomerController {
 
-    private final CustomerService customerService;
-
-    public CustomerController(CustomerService customerService) {
-        this.customerService = customerService;
-    }
 
     RestTemplate restTemplate = new RestTemplate();
 
