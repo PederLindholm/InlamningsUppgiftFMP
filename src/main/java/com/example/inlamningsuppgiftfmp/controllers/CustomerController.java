@@ -102,12 +102,6 @@ public class CustomerController {
         }
 
         try {
-            System.out.println("===== SENDING CUSTOMER =====");
-            System.out.println("ID: " + customerDto.getId());
-            System.out.println("Name: " + customerDto.getName());
-            System.out.println("Email: " + customerDto.getEmail());
-            System.out.println("Tel: " + customerDto.getTel());
-
             restTemplate.put(
                     "http://customerservice:8081/customers",
                     customerDto
