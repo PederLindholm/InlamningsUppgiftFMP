@@ -81,4 +81,4 @@ MySQL
 Docker / Docker Compose
 RestTemplate (kommunikation mellan tjänster)
 
-Systemet är deployat på Railway:
+Systemet är deployat på Railway: https://inlamningsuppgiftfmp-production.up.railway.app/booking/all
